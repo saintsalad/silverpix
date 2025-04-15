@@ -25,23 +25,33 @@ const ICON_SIZE = 24;
 
 const App = () => {
   const [permission, requestPermission] = MediaLibrary.usePermissions();
-  const [IMAGES, setImages] = useState<MediaLibrary.Asset[]>([]);
+  const [IMAGES, setImages] = useState<ImageSourcePropType[]>([]);
+  const [albums, setAlbums] = useState<MediaLibrary.Album[]>([]);
+  const [assets, setAssets] = useState<MediaLibrary.Asset>();
   const ref = useRef<SwiperCardRefType>(null);
 
   const loadImages = async () => {
-    const album = await MediaLibrary.getAlbumAsync("Recents");
-    if (album) {
-      const assets = await MediaLibrary.getAssetsAsync({
-        album,
-        mediaType: "photo",
-        first: 30,
-        sortBy: [[MediaLibrary.SortBy.creationTime, false]],
-      });
-      setImages(assets.assets);
-    } else {
-      console.log("no album found");
-    }
+    //const albums = await MediaLibrary.getAlbumsAsync();
+
+    console.log("albuns ----------", albums)
+    const assets = await MediaLibrary.getAssetsAsync({
+      album: 'Recents',
+      mediaType: 'photo',
+      first: 50,
+      sortBy: [[MediaLibrary.SortBy.creationTime, false]],
+    });
+    setImages(assets.assets);
   };
+
+
+  async function getAlbums() {
+
+    const fetchedAlbums = await MediaLibrary.getAlbumsAsync({
+      includeSmartAlbums: true,
+    });
+    console.log("get albums &&&&&&", fetchedAlbums.length)
+    setAlbums(fetchedAlbums);
+  }
 
   useEffect(() => {
     if (permission?.status !== "granted") {
@@ -49,9 +59,41 @@ const App = () => {
       requestPermission();
     } else {
       console.log("getting gallery images");
-      loadImages();
+      getAlbums()
+      //loadImages();
     }
   }, [permission]);
+
+  useEffect(() => {
+    const fetchAlbumAssets = async () => {
+      let asit: ImageSourcePropType[] = []
+
+      for (const [i, album] of albums.entries()) {
+        const x = await getAlbumAssets(album)
+        asit = [...asit, ...x]
+      }
+
+      asit.forEach(item => {
+        setImages(prev => [...prev, item])
+      })
+    }
+
+    fetchAlbumAssets()
+  }, [albums])
+
+  async function getAlbumAssets(album: MediaLibrary.Album) {
+    const albumAssets = await MediaLibrary.getAssetsAsync({
+      album: album.id
+    })
+
+    const assetUris: ImageSourcePropType[] = []
+
+    albumAssets.assets.forEach((image, i) => {
+      assetUris.push(image)
+    })
+
+    return assetUris
+  }
 
   const renderCard = useCallback((image: ImageSourcePropType) => {
     return (
@@ -116,43 +158,45 @@ const App = () => {
   return (
     <GestureHandlerRootView style={styles.container}>
       <View style={styles.subContainer}>
-        <Swiper
-          ref={ref}
-          cardStyle={styles.cardStyle}
-          data={IMAGES}
-          renderCard={renderCard}
-          onIndexChange={(index) => {
-            console.log("Current Active index", index);
-          }}
-          onSwipeRight={(cardIndex) => {
-            console.log("cardIndex", cardIndex);
-          }}
-          onSwipedAll={() => {
-            console.log("onSwipedAll");
-          }}
-          onSwipeLeft={(cardIndex) => {
-            console.log("onSwipeLeft", cardIndex);
-          }}
-          onSwipeTop={(cardIndex) => {
-            console.log("onSwipeTop", cardIndex);
-          }}
-          onSwipeBottom={(cardIndex) => {
-            console.log("onSwipeBottom", cardIndex);
-          }}
-          OverlayLabelRight={OverlayLabelRight}
-          OverlayLabelLeft={OverlayLabelLeft}
-          OverlayLabelTop={OverlayLabelTop}
-          OverlayLabelBottom={OverlayLabelBottom}
-          onSwipeActive={() => {
-            console.log("onSwipeActive");
-          }}
-          onSwipeStart={() => {
-            console.log("onSwipeStart");
-          }}
-          onSwipeEnd={() => {
-            console.log("onSwipeEnd");
-          }}
-        />
+        {IMAGES && (
+          <Swiper
+            ref={ref}
+            cardStyle={styles.cardStyle}
+            data={IMAGES}
+            renderCard={renderCard}
+            onIndexChange={(index) => {
+              console.log("Current Active index", index);
+            }}
+            onSwipeRight={(cardIndex) => {
+              console.log("cardIndex", cardIndex);
+            }}
+            onSwipedAll={() => {
+              console.log("onSwipedAll");
+            }}
+            onSwipeLeft={(cardIndex) => {
+              console.log("onSwipeLeft", cardIndex);
+            }}
+            onSwipeTop={(cardIndex) => {
+              console.log("onSwipeTop", cardIndex);
+            }}
+            onSwipeBottom={(cardIndex) => {
+              console.log("onSwipeBottom", cardIndex);
+            }}
+            OverlayLabelRight={OverlayLabelRight}
+            OverlayLabelLeft={OverlayLabelLeft}
+            OverlayLabelTop={OverlayLabelTop}
+            OverlayLabelBottom={OverlayLabelBottom}
+            onSwipeActive={() => {
+              console.log("onSwipeActive");
+            }}
+            onSwipeStart={() => {
+              console.log("onSwipeStart");
+            }}
+            onSwipeEnd={() => {
+              console.log("onSwipeEnd");
+            }}
+          />
+        )}
       </View>
 
       <View style={styles.buttonsContainer}>
@@ -241,6 +285,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     height: "75%",
     width: "100%",
+    backgroundColor: "black"
   },
   renderCardImage: {
     height: "100%",
