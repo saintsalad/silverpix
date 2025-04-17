@@ -1,25 +1,17 @@
-/* eslint-disable react-native/no-inline-styles */
+
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Image,
   StyleSheet,
   View,
   type ImageSourcePropType,
+  Text
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AntDesign } from "@expo/vector-icons";
 import { Swiper, type SwiperCardRefType } from "rn-swiper-list";
 import ActionButton from "../../components/ActionButton";
 import * as MediaLibrary from "expo-media-library";
-import * as ImagePicker from "expo-image-picker";
-
-// const IMAGES: ImageSourcePropType[] = [
-//   require("../../assets/images/test/1.png"),
-//   require("../../assets/images/test/2.png"),
-//   require("../../assets/images/test/3.png"),
-//   require("../../assets/images/test/4.png"),
-//   require("../../assets/images/test/5.png"),
-// ];
 
 const ICON_SIZE = 24;
 
@@ -30,18 +22,18 @@ const App = () => {
   const [assets, setAssets] = useState<MediaLibrary.Asset>();
   const ref = useRef<SwiperCardRefType>(null);
 
-  const loadImages = async () => {
-    //const albums = await MediaLibrary.getAlbumsAsync();
-
-    console.log("albuns ----------", albums)
-    const assets = await MediaLibrary.getAssetsAsync({
-      album: 'Recents',
-      mediaType: 'photo',
-      first: 50,
-      sortBy: [[MediaLibrary.SortBy.creationTime, false]],
-    });
-    setImages(assets.assets);
-  };
+  // const markPhotoAsFavorite = async (id: string) => {
+  //   try {
+  //     if (!FavoritePhotoModule) {
+  //       throw new Error('FavoritePhotoModule is not initialized');
+  //     }
+  //     const result = await FavoritePhotoModule.markAsFavorite(id);
+  //     console.log('Marked favorite:', result);
+  //   } catch (e) {
+  //     console.error('Failed to mark as favorite:', e);
+  //     // You might want to show an error message to the user here
+  //   }
+  // };
 
 
   async function getAlbums() {
@@ -113,9 +105,19 @@ const App = () => {
           styles.overlayLabelContainer,
           {
             backgroundColor: "green",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
           },
         ]}
-      />
+      >
+        <Text style={{
+          fontSize: 50,
+          fontWeight: "bold",
+          fontStyle: "italic",
+          color: "white",
+        }}>KEEP</Text>
+      </View>
     );
   }, []);
   const OverlayLabelLeft = useCallback(() => {
@@ -125,9 +127,19 @@ const App = () => {
           styles.overlayLabelContainer,
           {
             backgroundColor: "red",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
           },
         ]}
-      />
+      >
+        <Text style={{
+          fontSize: 50,
+          fontWeight: "bold",
+          fontStyle: "italic",
+          color: "white",
+        }}>DELETE</Text>
+      </View>
     );
   }, []);
   const OverlayLabelTop = useCallback(() => {
@@ -177,7 +189,20 @@ const App = () => {
               console.log("onSwipeLeft", cardIndex);
             }}
             onSwipeTop={(cardIndex) => {
-              console.log("onSwipeTop", cardIndex);
+              try {
+                console.log("onSwipeTop", typeof IMAGES[cardIndex]);
+                // const image = IMAGES[cardIndex];
+
+                // if (image && typeof image === 'object' && 'id' in image) {
+                //   const id = String(image.id);
+                //   console.log("Attempting to mark as favorite with ID:", id);
+                //   markPhotoAsFavorite(id);
+                // } else {
+                //   console.warn('Image or image ID not found');
+                // }
+              } catch (error) {
+                console.error('Error in onSwipeTop:', error);
+              }
             }}
             onSwipeBottom={(cardIndex) => {
               console.log("onSwipeBottom", cardIndex);
