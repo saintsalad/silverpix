@@ -1,0 +1,17 @@
+{
+  "platforms": [
+    "apple",
+    "android",
+    "web"
+  ],
+  "apple": {
+    "modules": [
+      "ExpoToastModule"
+    ]
+  },
+  "android": {
+    "modules": [
+      "expo.modules.toast.ExpoToastModule"
+    ]
+  }
+}

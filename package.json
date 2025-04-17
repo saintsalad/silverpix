@@ -13,6 +13,7 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "expo-toast": "file:./packages/expo-toast",
     "@expo/vector-icons": "^14.0.2",
     "@fast-styles/babel-plugin": "^0.2.3",
     "@fast-styles/react": "^0.2.9",

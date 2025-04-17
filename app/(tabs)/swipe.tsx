@@ -12,6 +12,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { Swiper, type SwiperCardRefType } from "rn-swiper-list";
 import ActionButton from "../../components/ActionButton";
 import * as MediaLibrary from "expo-media-library";
+import Toast from "expo-toast"
 
 const ICON_SIZE = 24;
 
@@ -191,6 +192,7 @@ const App = () => {
             onSwipeTop={(cardIndex) => {
               try {
                 console.log("onSwipeTop", typeof IMAGES[cardIndex]);
+                Toast.showToast("TETSTSTSTT")
                 // const image = IMAGES[cardIndex];
 
                 // if (image && typeof image === 'object' && 'id' in image) {
